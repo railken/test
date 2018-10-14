@@ -26,7 +26,7 @@ class SimpleTest extends BaseTest
     {
         echo "\n\n---------------------------\n";
         $this->fsTest(100000);
-        $this->qbTest(100000);
+        // $this->qbTest(100000);
         $this->pdoTest(100000);
     }
 
