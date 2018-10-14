@@ -25,9 +25,9 @@ class SimpleTest extends BaseTest
     public function testSimple()
     {
         echo "\n\n---------------------------\n";
-        $this->fsTest(1000);
-        $this->qbTest(1000);
-        $this->pdoTest(1000);
+        $this->fsTest(100000);
+        $this->qbTest(100000);
+        $this->pdoTest(100000);
     }
 
     public function fsTest($n)
