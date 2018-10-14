@@ -22,19 +22,19 @@ class SimpleTest extends BaseTest
         return str_random(80);
     }
 
-    public function testSimpleContent()
+    public function testSimple()
     {
-        $dir = $this->getCacheVar();
+        echo "\n\n---------------------------\n";
+        $this->fsTest(1000);
+        $this->qbTest(1000);
+        $this->pdoTest(1000);
+    }
 
+    public function fsTest($n)
+    {
+        echo "\nTesting fs with {$n}...";
         $start = microtime(true);
-
-        $n = 1000;
-
-        echo "\n";
-        echo "----------------------\n";
-        echo "Testing with (write and remove): $n...\n";
-        echo "----------------------\n";
-
+        $dir = $this->getCacheVar();
 
         for ($i = 0; $i < $n; ++$i) {
             $filename = $dir.'/'.$i.'.txt';
@@ -42,7 +42,13 @@ class SimpleTest extends BaseTest
             unlink($filename);
         }
 
-        $files = (microtime(true) - $start);
+        echo microtime(true) - $start;
+    }
+
+    public function qbTest($n)
+    {
+        echo "\nTesting qb with {$n}...";
+
         $start = microtime(true);
 
         for ($i = 0; $i < $n; ++$i) {
@@ -50,10 +56,25 @@ class SimpleTest extends BaseTest
             DB::table('foo')->where(['name' => $i])->delete();
         }
 
-        $db = (microtime(true) - $start);
+        echo microtime(true) - $start;
+    }
 
-        echo 'Files (file_put_contents + unlink): '.$files;
-        echo "\n";
-        echo 'Mysql (insert + remove): '.$db;
+    public function pdoTest($n)
+    {
+        echo "\nTesting pdo with {$n}...";
+
+        $con = new \PDO(env('DB_CONNECTION').':host='.env('DB_HOST').';port='.env('DB_PORT').';dbname='.env('DB_DATABASE').'', env('DB_USERNAME'), env('DB_PASSWORD'));
+
+        $start = microtime(true);
+
+        for ($i = 0; $i < $n; ++$i) {
+            $stmt = $con->prepare('INSERT INTO foo (name, body) VALUES (?,?)');
+            $stmt->execute([$i, $this->getRandomString()]);
+
+            $stmt = $con->prepare('DELETE FROM foo WHERE name = ?');
+            $stmt->execute([$i]);
+        }
+
+        echo microtime(true) - $start;
     }
 }
